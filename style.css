@@ -1,0 +1,28 @@
+.graticule {
+    fill: #e8e8e8;
+    /* stroke: #000;*/
+}
+
+.graticule.outline {
+    stroke-width: 2px;
+}
+
+.toggle.ios,
+.toggle-on.ios,
+.toggle-off.ios {
+    border-radius: 20px;
+}
+
+.toggle.ios .toggle-handle {
+    border-radius: 20px;
+}
+
+table td {
+    padding: 2px 5px;
+}
+
+#chart>canvas,
+#chart>svg {
+    position: absolute;
+    left: 0;
+}

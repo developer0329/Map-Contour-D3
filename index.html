@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3">
+                <hr>
+                <div class="row">
+                    <table>
+                        <tr>
+                            <td></td>
+                            <td>Elements</td>
+                            <td>Labels</td>
+                        </tr>
+                        <tr>
+                            <td><label>OBJECTS</label></td>
+                            <td><input type="checkbox" checked data-toggle="toggle" data-style="ios" id="obj-ele-toggle"></td>
+                            <td><input type="checkbox" checked data-toggle="toggle" data-style="ios" id="obj-lbl-toggle"></td>
+                        </tr>
+                        <tr>
+                            <td><label>ASPECTS</label></td>
+                            <td><input type="checkbox" checked data-toggle="toggle" data-style="ios" id="asp-ele-toggle"></td>
+                            <td><input type="checkbox" checked data-toggle="toggle" data-style="ios" id="asp-lbl-toggle"></td>
+                        </tr>
+                        <tr>
+                            <td><label>THEMES</label></td>
+                            <td><input type="checkbox" checked data-toggle="toggle" data-style="ios" id="thm-ele-toggle"></td>
+                            <td><input type="checkbox" checked data-toggle="toggle" data-style="ios" id="thm-lbl-toggle"></td>
+                        </tr>
+                        <tr>
+                            <td><label>SEGMENTS</label></td>
+                            <td><input type="checkbox" checked data-toggle="toggle" data-style="ios" id="seg-ele-toggle"></td>
+                            <td><input type="checkbox" checked data-toggle="toggle" data-style="ios" id="seg-lbl-toggle"></td>
+                        </tr>
+                    </table>
+
+
+                </div>
+
+                <hr>
+                <div class="row">
+                    <label>OBJECT SCATTER</label>
+                    <input type="checkbox" checked data-toggle="toggle" data-style="ios" id="obj-sct-toggle">
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div id="chart"></div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script src="//d3js.org/d3.v3.min.js"></script>
+<script src="//d3js.org/d3.geo.projection.v0.min.js"></script>
+<!--<script src="d3.geom.contour.min.js"></script>-->
+<!--<script src="https://d3js.org/d3-color.v1.min.js"></script>-->
+<!--<script src="https://d3js.org/d3-format.v1.min.js"></script>-->
+<!--<script src="https://d3js.org/d3-interpolate.v1.min.js"></script>-->
+<!--<script src="https://d3js.org/d3-time.v1.min.js"></script>-->
+<!--<script src="https://d3js.org/d3-time-format.v2.min.js"></script>-->
+<!--<script src="https://d3js.org/d3-scale.v1.min.js"></script>-->
+<!--<script src="https://d3js.org/d3-zoom.v1.min.js"></script>-->
+<!--<script src="https://d3js.org/d3-drag.v1.min.js"></script>-->
+<script src="https://d3js.org/d3-array.v1.min.js"></script>
+<!--<script src="https://d3js.org/d3-geo.v1.min.js"></script>-->
+<!--<script src="https://d3js.org/d3-selection.v1.min.js"></script>-->
+<script src="https://d3js.org/d3-collection.v1.min.js"></script>
+<script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
+<script src="https://d3js.org/d3-request.v1.min.js"></script>
+<!--<script src="http://d3js.org/topojson.v1.min.js"></script>-->
+<!--<script src="https://d3js.org/d3-geo-projection.v1.min.js"></script>-->
+
+<!--<script src="geotiff.min.js"></script>-->
+<script src="https://npmcdn.com/d3-marching-squares@0.0.4"></script>
+
+<script type="text/javascript">
+    $('#obj-ele-toggle').bootstrapToggle();
+    $('#obj-lbl-toggle').bootstrapToggle();
+    $('#asp-ele-toggle').bootstrapToggle();
+    $('#asp-lbl-toggle').bootstrapToggle();
+    $('#thm-ele-toggle').bootstrapToggle();
+    $('#thm-lbl-toggle').bootstrapToggle();
+    $('#seg-ele-toggle').bootstrapToggle();
+    $('#seg-lbl-toggle').bootstrapToggle();
+    $('#obj-sct-toggle').bootstrapToggle();
+
+    $('#obj-ele-toggle').change(function() {
+        var state = $(this).prop('checked');
+        if (state) {
+            $(".node.objects").css('visibility', 'visible');
+        } else {
+            $(".node.objects").css('visibility', 'hidden');
+        }
+    });
+
+    $('#obj-lbl-toggle').change(function() {
+        var state = $(this).prop('checked');
+        if (state) {
+            $(".node.objects text").css('visibility', 'visible');
+        } else {
+            $(".node.objects text").css('visibility', 'hidden');
+        }
+    });
+
+    $('#asp-ele-toggle').change(function() {
+        var state = $(this).prop('checked');
+        if (state) {
+            $(".node.aspects").css('visibility', 'visible');
+        } else {
+            $(".node.aspects").css('visibility', 'hidden');
+        }
+    });
+
+    $('#asp-lbl-toggle').change(function() {
+        var state = $(this).prop('checked');
+        if (state) {
+            $(".node.aspects text").css('visibility', 'visible');
+        } else {
+            $(".node.aspects text").css('visibility', 'hidden');
+        }
+    });
+
+    $('#thm-ele-toggle').change(function() {
+        var state = $(this).prop('checked');
+        if (state) {
+            $(".node.themes").css('visibility', 'visible');
+        } else {
+            $(".node.themes").css('visibility', 'hidden');
+        }
+    });
+
+    $('#thm-lbl-toggle').change(function() {
+        var state = $(this).prop('checked');
+        if (state) {
+            $(".node.themes text").css('visibility', 'visible');
+        } else {
+            $(".node.themes text").css('visibility', 'hidden');
+        }
+    });
+
+    $('#seg-ele-toggle').change(function() {
+        var state = $(this).prop('checked');
+        if (state) {
+            $(".node.segments").css('visibility', 'visible');
+        } else {
+            $(".node.segments").css('visibility', 'hidden');
+        }
+    });
+
+    $('#seg-lbl-toggle').change(function() {
+        var state = $(this).prop('checked');
+        if (state) {
+            $(".node.segments text").css('visibility', 'visible');
+        } else {
+            $(".node.segments text").css('visibility', 'hidden');
+        }
+    });
+
+    $('#obj-sct-toggle').change(function() {
+        var state = $(this).prop('checked');
+        if (state) {
+            $(".graticule.line").css('opacity', 0);
+        } else {
+            $(".graticule.line").css('opacity', 1);
+        }
+    });
+
+    //var width = $("#chart").width() - 200;
+    //var height = $("#chart").width() - 600;
+    var width = 800;
+    var height = 400;
+    var rotate = 90;
+    var projection = d3.geo.mollweide()
+        .translate([width / 2, height / 2])
+        .rotate([rotate, 0])
+        .scale([width / 7]);
+
+    d3.json("map_2d_object.json", function(error, data) {
+        var aspects = data.aspects_unprojected;
+        var contours = data.contours_unprojected;
+        var surface = data.surface_unprojected;
+
+        function DrawPlot() {
+            var path = d3.geo.path().projection(projection);
+            var graticule = d3.geo.graticule();
+
+            var svg = d3.select("#chart").append("svg")
+                .attr("width", width)
+                .attr("height", height);
+
+            svg.append("path")
+                .datum(graticule.outline)
+                .attr("class", "graticule line")
+                .attr("d", path);
+
+            d3.json("data.json", function(error, data) {
+
+                var datum = [];
+                var aspects = [];
+                for (var i = data.interview_collection.length - 1; i >= 0; i--) {
+                    aspects = aspects.concat(data.interview_collection[i].aspects)
+                };
+                datum = datum.concat(aspects);
+
+                var objects = data.centroids;
+                datum = datum.concat(objects);
+
+                var themes = data.clustering_results.cluster_collection;
+                datum = datum.concat(themes);
+
+                var segments = data.segments_results.segment_collection;
+                datum = datum.concat(segments);
+
+
+                var node = svg.selectAll(".node")
+                    .data(datum)
+                    .enter().append("g")
+                    .attr("class", function(d) {
+                        if (typeof d.segment_name != "undefined") {
+                            return "node segments";
+                        } else if (typeof d.aid != "undefined") {
+                            return "node aspects";
+                        } else if (typeof d.oid != "undefined") {
+                            return "node objects";
+                        } else if (typeof d.cluster_id != "undefined") {
+                            return "node themes";
+                        } else {
+                            return "node";
+                        }
+                    })
+                    .attr("id", function(d) {
+                        if (typeof d.segment_name != "undefined") {
+                            return "segment" + d.segment_id;
+                        } else if (typeof d.aid != "undefined") {
+                            return "aspect" + d.aid;
+                        } else if (typeof d.oid != "undefined") {
+                            return "object" + d.oid;
+                        } else if (typeof d.cluster_id != "undefined") {
+                            return "theme" + d.cluster_id;
+                        } else {
+                            return "node";
+                        }
+                    })
+                    .attr("transform", function(d) {
+                        return "translate(" + projection([d.l1, d.l2])[0] + "," + projection([d.l1, d.l2])[1] + ")";
+                    })
+                    .on("click", function(d) {
+                        if (typeof d.segment_id != "undefined") {
+                            for (var i = 0; i < d.iids.length; i++) {
+                                var vis = $("#aspect" + d.iids[i]).css("visibility");
+
+                                if ($("#aspect" + d.iids[i]).css("visibility") == "visible") {
+                                    $("#aspect" + d.iids[i]).css('visibility', 'hidden');
+                                } else {
+                                    $("#aspect" + d.iids[i]).css('visibility', 'visible');
+                                }
+                            }
+                        }
+                    });
+
+
+                var customSymbolTypes = d3.map({
+                    'thin-x': function(size) {
+                        size = Math.sqrt(size);
+                        return 'M' + (-size / 2) + ',' + (-size / 2) +
+                            'l' + size + ',' + size +
+                            'm0,' + -(size) +
+                            'l' + (-size) + ',' + size;
+                    },
+                    'smiley': function(size) {
+                        size = Math.sqrt(size);
+                        var pad = size / 5;
+                        var r = size / 8;
+                        return 'M' + ((-size / 2) + pad) + ',' + (-size / 2) +
+                            ' m' + (-r) + ',0' +
+                            ' a' + r + ',' + r + ' 0 1,0' + (r * 2) + ',0' +
+                            ' a' + r + ',' + r + ' 0 1,0' + (-(r * 2)) + ',0' +
+
+                            'M' + ((size / 2) - pad) + ',' + (-size / 2) +
+                            ' m' + (-r) + ',0' +
+                            ' a' + r + ',' + r + ' 0 1,0' + (r * 2) + ',0' +
+                            ' a' + r + ',' + r + ' 0 1,0' + (-(r * 2)) + ',0' +
+
+                            'M' + (-size / 2) + ',' + ((size / 2) - (2 * pad)) +
+                            'q' + (size / 2) + ',' + (pad * 2) + ' ' + size + ',0';
+                    }
+                });
+
+                d3.svg.customSymbol = function() {
+                    var type,
+                        size = 64;
+
+                    function symbol(d, i) {
+                        return customSymbolTypes.get(type.call(this, d, i))(size.call(this, d, i));
+                    }
+                    symbol.type = function(_) {
+                        if (!arguments.length) return type;
+                        type = d3.functor(_);
+                        return symbol;
+                    };
+                    symbol.size = function(_) {
+                        if (!arguments.length) return size;
+                        size = d3.functor(_);
+                        return symbol;
+                    };
+                    return symbol;
+                };
+
+                function getSymbol(type, size) {
+                    size = size || 64;
+                    if (d3.svg.symbolTypes.indexOf(type) !== -1) {
+                        return d3.svg.symbol().type(type).size(size)();
+                    } else {
+                        return d3.svg.customSymbol().type(type).size(size)();
+                    }
+                }
+                node.append('path')
+                    .attr('d', function(d) {
+                        return getSymbol("thin-x", 64);
+                    })
+                    .attr('fill', 'transparent')
+                    .attr('stroke-width', '2px')
+                    .attr("stroke", function(d) {
+                        if (typeof d.aspect_color == 'undefined') {
+                            return "steelblue";
+                        } else {
+                            return d.aspect_color;
+                        }
+                    });
+
+                node.append("text")
+                    .attr("dx", 5)
+                    .attr("dy", ".35em")
+                    .text(function(d) {
+                        if (typeof d.aspect_name != "undefined") {
+                            return d.aspect_name;
+                        } else if (typeof d.object_name != "undefined") {
+                            return d.object_name;
+                        } else if (typeof d.theme_name != "undefined") {
+                            return d.theme_name;
+                        } else if (typeof d.segment_name != "undefined") {
+                            return d.segment_name;
+                        }
+                    });
+
+                toggleCheck();
+            });
+        }
+
+        function DrawMap() {
+            var canvas = d3.select("#chart").append("canvas")
+                .attr("width", width)
+                .attr("height", height);
+            var context = canvas.node().getContext("2d");
+            var path = d3.geo.path().projection(projection).context(context);
+
+            // d3.json("surface_array.json", function(error, array_data) {
+            //     if (error) throw error;
+
+            //     d3.json("polygon_unprojected.json", function(error, data) {
+            //         if (error) throw error;
+
+            var mx = projection([180 - rotate, 0])[0];
+            var mn = projection([180 - rotate + 1, 0])[0];
+            var md = projection([0, 0])[0];
+            console.log(mn, md, mx)
+
+            function getOutline(point) {
+                var p = projection(point)[0];
+                var delta = Math.abs(mx - p);
+                var result = 1;
+
+                if (delta > Math.abs(mn - p)) {
+                    delta = Math.abs(mn - p);
+                    result = -1;
+                }
+
+                if (delta > Math.abs(md - p)) {
+                    delta = Math.abs(md - p);
+                    result = 0;
+                }
+                return result;
+            }
+
+            var lineData = [];
+
+            for (var i = 0; i < contours.length; i++) {
+                var item = [];
+                var lines = [];
+                var status = 'none';
+                for (var j = 0; j < contours[i].pathData.length; j++) {
+                    var r = projection([contours[i].pathData[j].lat, contours[i].pathData[j].lon])[0];
+
+                    if (md < r && r < mx) {
+                        if (status == 'none') {
+                            status = 'p';
+                        } else if (status == 'n') {
+                            var temp = [];
+                            if (getOutline(item[item.length - 1]) == 1) {
+
+                                temp = [180, item[item.length - 1][1]];
+                            } else if (getOutline(item[item.length - 1]) == 0) {
+                                temp = [0, item[item.length - 1][1]];
+                            } else if (getOutline(item[item.length - 1]) == -1) {
+                                temp = [-180, item[item.length - 1][1]];
+                            }
+                            item.push(temp);
+                            lines.push(item);
+                            status = 'p';
+                            item = [];
+                            item.push(temp);
+                        }
+                        item.push([contours[i].pathData[j].lat, contours[i].pathData[j].lon]);
+                    } else if (mn < r && r < md) {
+                        if (status == 'none') {
+                            status = 'n';
+                        } else if (status == 'p') {
+                            var temp = [];
+                            if (getOutline(item[item.length - 1]) == 1) {
+                                temp = [180, item[item.length - 1][1]];
+                            } else if (getOutline(item[item.length - 1]) == 0) {
+                                temp = [0, item[item.length - 1][1]];
+                            } else if (getOutline(item[item.length - 1]) == -1) {
+                                temp = [-180, item[item.length - 1][1]];
+                            }
+                            item.push(temp);
+                            lines.push(item);
+                            status = 'n';
+                            item = [];
+                            item.push(temp);
+                        }
+
+                        item.push([contours[i].pathData[j].lat, contours[i].pathData[j].lon]);
+                    } else {
+                        console.log(r);
+                    }
+
+                }
+                if (lines.length !== 0) {
+                    lines[0] = item.concat(lines[0]);
+                } else {
+                    lines.push(item);
+                }
+
+                if (getOutline(item[item.length - 1]) == 1) {
+                    temp = [180, item[item.length - 1][1]];
+                } else if (getOutline(item[item.length - 1]) == 0) {
+                    temp = [0, item[item.length - 1][1]];
+                } else if (getOutline(item[item.length - 1]) == -1) {
+                    temp = [-180, item[item.length - 1][1]];
+                }
+
+                for (var k = 0; k < lines.length; k++) {
+                    var line = lines[k];
+
+                    if (line[line.length - 1][0] == 180) {
+                        //line.splice(0, 0, [180, 0]);
+                        line.push([180, 0]);
+                        line.push([180, line[0][1]]);
+                    } else if (line[line.length - 1][0] == 0) {
+                        //line.splice(0, 0, [0, line[0][1]]);
+                        // line.push([0, 0]);
+                        // line.push([0, line[0][1]]);
+                    } else if (line[line.length - 1][0] == -180) {
+                        //line.splice(0, 0, [-180, line[0][1]]);
+                        line.push([-180, 0]);
+                        line.push([-180, line[0][1]]);
+                    }
+
+                    lineData.push({
+                        level: contours[i].level,
+                        name: contours[i].name,
+                        line: line
+                    });
+                }
+            }
+            var tiepoint = {
+                i: 0,
+                j: 0,
+                k: 0,
+                x: -180,
+                y: 90,
+                z: 0
+            };
+            var pixelScale = [0.999929916897507, 0.994475138121547, 0]
+
+            var extent = [0, 1];
+            var maxVal = 1.1;
+            var minVal = -0.1;
+
+            var intervals = d3.range(extent[0], extent[1], (maxVal - minVal) / 20);
+            intervals.push(1);
+            var color = d3.scale.linear().domain([extent[0], (extent[0] + extent[1]) / 2, extent[1]])
+                .interpolate(d3.interpolateHcl)
+                .range([d3.rgb("#FF0000"), d3.rgb('#FFFF00'), d3.rgb('#00FF00')]);
+
+            var colors = d3.ticks(extent[0], extent[1], intervals.length).map(function(d) {
+                return color(d);
+            });
+            var geoTransform = [tiepoint.x, pixelScale[0], 0, tiepoint.y, 0, -1 * pixelScale[1]];
+            var bands = d3marchingsquares.isobands(surface, geoTransform, intervals);
+            var graticule = d3.geo.graticule();
+            render();
+
+
+            function render() {
+                context.clearRect(0, 0, width, height);
+
+                bands.features.forEach(function(d, i) {
+                    context.beginPath();
+                    context.globalAlpha = 0.4;
+                    context.fillStyle = colors[i];
+                    path(d);
+                    context.fill();
+                });
+
+                context.beginPath();
+                path(graticule());
+                context.lineWidth = 0.5;
+                context.strokeStyle = "#ddd";
+                context.stroke();
+
+                for (var i = 0; i < lineData.length; i++) {
+
+                    var geoFeature = {
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "LineString",
+                            "coordinates": lineData[i].line
+                        },
+                        "properties": {
+                            "name": "Plaza Road Park"
+                        }
+                    };
+                    context.beginPath();
+                    var opacity = lineData[i].level;
+                    context.fillStyle = "rgba(10,10,10,0.1)";
+                    path(geoFeature);
+                    context.fill();
+                    context.lineWidth = 6;
+                    context.strokeStyle = "rgba(255,255,255,0.2)";
+                    context.stroke();
+                }
+            }
+            //     });
+            // });
+        }
+
+
+
+        DrawMap();
+        //DrawPlot();
+        toggleCheck();
+
+        function toggleCheck() {
+
+            var obj_sct_state = $('#obj-sct-toggle').prop('checked');
+            if (obj_sct_state) {
+                $(".graticule.line").css('opacity', 0);
+            } else {
+                $(".graticule.line").css('opacity', 1);
+            }
+
+            var obj_ele_toggle_state = $('#obj-ele-toggle').prop('checked');
+            if (obj_ele_toggle_state) {
+                $(".node.objects").css('visibility', 'visible');
+            } else {
+                $(".node.objects").css('visibility', 'hidden');
+            }
+
+            var obj_lbl_toggle_state = $('#obj-lbl-toggle').prop('checked');
+            if (obj_lbl_toggle_state) {
+                $(".node.objects text").css('visibility', 'visible');
+            } else {
+                $(".node.objects text").css('visibility', 'hidden');
+            }
+
+            var asp_ele_toggle_state = $('#asp-ele-toggle').prop('checked');
+            if (asp_ele_toggle_state) {
+                $(".node.aspects").css('visibility', 'visible');
+            } else {
+                $(".node.aspects").css('visibility', 'hidden');
+            }
+
+            var asp_lbl_toggle_state = $('#asp-lbl-toggle').prop('checked');
+            if (asp_lbl_toggle_state) {
+                $(".node.aspects text").css('visibility', 'visible');
+            } else {
+                $(".node.aspects text").css('visibility', 'hidden');
+            }
+
+            var thm_ele_toggle_state = $('#thm-ele-toggle').prop('checked');
+            if (thm_ele_toggle_state) {
+                $(".node.themes").css('visibility', 'visible');
+            } else {
+                $(".node.themes").css('visibility', 'hidden');
+            }
+
+            var thm_lbl_toggle_state = $('#thm-lbl-toggle').prop('checked');
+            if (thm_lbl_toggle_state) {
+                $(".node.themes text").css('visibility', 'visible');
+            } else {
+                $(".node.themes text").css('visibility', 'hidden');
+            }
+
+            var seg_ele_toggle_state = $('#seg-ele-toggle').prop('checked');
+            if (seg_ele_toggle_state) {
+                $(".node.segments").css('visibility', 'visible');
+            } else {
+                $(".node.segments").css('visibility', 'hidden');
+            }
+
+            var seg_lbl_toggle_state = $('#seg-lbl-toggle').prop('checked');
+            if (seg_lbl_toggle_state) {
+                $(".node.segments text").css('visibility', 'visible');
+            } else {
+                $(".node.segments text").css('visibility', 'hidden');
+            }
+        }
+    });
+</script>
+
+</html>
